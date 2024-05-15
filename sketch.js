@@ -18,27 +18,54 @@ function setup () {
 
   imageMode(CENTER);
   noStroke();
-  background(255, 0, 0);
+  background(0, 255, 0); //(255, 0, 0)
   sourceImg.loadPixels();
   maskImg.loadPixels();
 }
 
 function draw () {
   for(let i=0;i<4000;i++) {
+    //random xy
     let x = floor(random(sourceImg.width));
     let y = floor(random(sourceImg.height));
     let pix = sourceImg.get(x, y);
     let mask = maskImg.get(x, y);
     fill(pix);
-    if(mask[0] > 128) {
-      let pointSize = 10;
-      ellipse(x, y, pointSize, pointSize);
+  //   //draw on mask
+  //   if(mask[0] > 128) {
+  //     let pointSize = 10;
+  //     ellipse(x, y, pointSize, pointSize);
+  //   }
+  //   //draw on input
+  //   else {
+  //     fill(0, pix[1], 0);
+  //     let pointSize = 20;
+  //     rect(x, y, pointSize, pointSize);    
+  //   }
+  // }
+
+  //example
+  if (mask[0] > 128) {
+    let pointSize = 10;
+  //different stroke color
+    stroke(pix)
+    strokeWeight(height/500)
+    console.log(pix[0])
+    if(pix[0] > 120){
+    line(x, y, x, y+height/10)
+    }else{
+      line(x, y, x, y-height/10)
     }
-    else {
-      let pointSize = 20;
-      rect(x, y, pointSize, pointSize);    
-    }
+
   }
+  else{
+    noStroke()
+    fill(0,pix[1],0);
+    let pointSize = 20;
+    rect(x,y,pointSize, pointSize);
+  }
+  }
+
   renderCounter = renderCounter + 1;
   if(renderCounter > 10) {
     console.log("Done!")
