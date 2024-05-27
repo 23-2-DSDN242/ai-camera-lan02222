@@ -1,6 +1,5 @@
 let sourceImg=null;
 let maskImg=null;
-let renderCounter=0;
 
 // change these three lines as appropiate
 let sourceFile = "input_1.jpg";
@@ -18,73 +17,117 @@ function setup () {
 
   imageMode(CENTER);
   noStroke();
-  background(0, 255, 0); //(255, 0, 0)
+  background(0, 0, 128);
   sourceImg.loadPixels();
   maskImg.loadPixels();
+  colorMode(HSB);
 }
 
+let X_STOP = 600;
+let Y_STOP = 600;
+// let X_STOP = 1920;
+// let Y_STOP = 1080;
+//let OFFSET = 20;
+let OFFSET = 6;
+let renderCounter=0;
 function draw () {
-  let angle = 45;
-  let offsetX = 60;
-  let offsetY = 50;
+  angleMode(DEGREES);
+  let num_lines_to_draw = 40;
+  // get one scanline
+  for(let j=renderCounter; j<renderCounter+num_lines_to_draw && j<Y_STOP; j++) {
+    for(let i=0; i<X_STOP; i++) {
+      colorMode(RGB);
+      let mask = maskImg.get(i, j);
+  
+      let pix = [0, 0, 0, 255];
 
-  for(let i=0;i<4000;i++) {
-    //random xy
-    let x = floor(random(sourceImg.width));
-    let y = floor(random(sourceImg.height));
-    let pix = sourceImg.get(x, y);
-    let mask = maskImg.get(x, y);
-    
-    // push();
-    // rotate(radians(angle));
-        
-    
-    fill(pix);
-  //   //draw on mask
-    if(mask[0] > 128) {
-      let pointSize = 10;
-      ellipse(x, y, pointSize, pointSize);
-    }
-    //draw on input
-    else {
-      fill(0, pix[1], 0);
-      let pointSize = 20;
-      rect(x, y, pointSize, pointSize);    
+      if (mask[1] < 128) {
+
+        let sum_rgb = [0, 0, 0]
+        let num_cells = 0;
+        for(let wx=-OFFSET;wx<OFFSET;wx++){
+          for (let wy=-OFFSET;wy<OFFSET;wy++) {
+            let pix = sourceImg.get(i+wx, j+wy);
+            for(let c=0; c<3; c++) {
+              sum_rgb[c] += pix[c];
+            }
+            num_cells += 1;
+          }
+        }
+
+        for(let c=0; c<3; c++) {
+          pix[c] = int(sum_rgb[c] / num_cells);
+        } 
+      
+       }
+
+      else {
+        let wave = sin(j*8);
+        let slip = map(wave, -1, 1, -OFFSET, OFFSET);
+        pix = sourceImg.get(i+slip, j);
+
+        // let brt = map(wave, -1, 1, 0, 255);
+        // for(let c=0; c<3; c++) {
+        //   pix[c] = brt;
+        // }
+      }
+      set(i, j, pix);
+   
     }
   }
+ //////////// this is the finish of the blur 
 
-  //example
-  // if (mask[0] > 128) {
-  //   let pointSize = 10;
-  // //different stroke color
-  //   stroke(pix)
-  //   strokeWeight(height/500)
-  //   console.log(pix[0])
-  //   if(pix[0] > 120){
-  //   line(x+offsetX, y+offsetY, x+offsetX, y+height/10+offsetY)
-  //   }else{
-  //     line(x+offsetX, y+offsetY, x+offsetX, y-height/10+offsetY)
+  renderCounter = renderCounter + num_lines_to_draw;
+  updatePixels();
+
+///// drawing Eyes 
+let eyeSize = 100; 
+let spacing = 300;
+
+  for(let i = 0; i < X_STOP; i = i +spacing){
+    for(let j = 0; j < Y_STOP; j = j+spacing){
+      let mask = maskImg.get(i, j);
+      if (mask[1] < 128) {
+      DrawEye(i,j, eyeSize- 20);
+  }
+  }
+}
+
+  // /////// drawing Wiggle 
+  // for(let j=renderCounter; j<renderCounter+num_lines_to_draw && j<Y_STOP; j++) {
+  //   for(let i=0; i<X_STOP; i++) {
+
+  //     colorMode(RGB);
+  //     let mask = maskImg.get(i, j);
+  //     if (mask[1] > 128) { 
+
+  //       let wave = sin(j*8);
+  //       let slip = map(wave, -1, 1, -OFFSET, OFFSET);
+  //       pix = sourceImg.get(i+slip, j);
+  //     } 
+  //     set(i, j, pix);
   //   }
-
-  //   pop();
-
-
-  // }
-  // else{
-  //   noStroke()
-  //   fill(0,pix[1],0);
-  //   let pointSize = 20;
-  //   rect(x,y,pointSize, pointSize);
-  // }
   // }
 
-  renderCounter = renderCounter + 1;
-  if(renderCounter > 10) {
+
+
+ 
+  // print(renderCounter);
+  if(renderCounter > Y_STOP) {
     console.log("Done!")
     noLoop();
     // uncomment this to save the result
     // saveArtworkImage(outputFile);
   }
+}
+
+function DrawEye(x, y, Size){
+fill(255)
+  ellipse(x, y, Size);
+  let offsetX = random(-10,10);
+  let offsetY = random(-10,10);
+  fill(133, 146, 158 )
+  ellipse(x+offsetX, y+offsetY, Size-40);
 }
 
 function keyTyped() {
