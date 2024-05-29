@@ -46,7 +46,7 @@ function maskCenterSearch(min_width) {
       let mask_count = 0;
       for(let i=0; i<X_STOP; i++) {
         let mask = maskImg.get(i, j);
-        if (mask[0] > 128) {
+        if (mask[1] > 128) {
           mask_count = mask_count + 1;
         }
       }
@@ -64,7 +64,7 @@ function maskCenterSearch(min_width) {
       let mask_count = 0;
       for(let j=0; j<Y_STOP; j++) {
         let mask = maskImg.get(i, j);
-        if (mask[0] > 128) {
+        if (mask[1] > 128) {
           mask_count = mask_count + 1;
         }
       }
@@ -82,42 +82,37 @@ function maskCenterSearch(min_width) {
     }
 }
 
-let renderCounter=0;
+// let renderCounter=0;
 function draw () {
-  // angleMode(DEGREES);
+  angleMode(DEGREES);
   let num_lines_to_draw = 40;
-  let pointSize = 10;
-  let pointSpace = 5;
   // get one scanline
   for(let j=renderCounter; j<renderCounter+num_lines_to_draw && j<Y_STOP; j++) {
     for(let i=0; i<X_STOP; i++) {
       colorMode(RGB);
       let mask = maskImg.get(i, j);
-      if (mask[0] < 128) {
-        pix = sourceImg.get(i, j);
+      if (mask[1] < 128) {
+        let colOffset = 3;
+        let Rpix = sourceImg.get(i+colOffset, j);
+        let Gpix = sourceImg.get(i, j);
+        let Bpix = sourceImg.get(i-colOffset, j);
+
+        let fragcolor = [Rpix[0],Gpix[1],Bpix[2],255];
+
+        // pix = sourceImg.get(i, j);
+        set(i, j, fragcolor);
       }
       else {
-        if(j%5 == 0) {
-          if(i% pointSpace == 0) {
-          pix = [255, 255, 0, 255]
-        noStroke();
-        ellipse(i, j, pointSize, pointSize);
-        }
-        else {
-          pix = sourceImg.get(i, j);    
-          set(i, j, pix);      
-        }
-
-      // set(i, j, pix);
+          pix = sourceImg.get(i, j);          
+      set(i, j, pix);
     }
-  }
-}
+    }
   }
   renderCounter = renderCounter + num_lines_to_draw;
   updatePixels();
 
   if (maskCenter !== null) {
-    strokeWeight(2);
+    strokeWeight(5);
     fill(0, 255, 0);
     stroke(255, 0, 0);
     ellipse(maskCenter[0], maskCenter[1], 100);
