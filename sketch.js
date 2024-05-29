@@ -5,6 +5,8 @@ let maskImg=null;
 let sourceFile = "input_1.jpg";
 let maskFile   = "mask_1.png";
 let outputFile = "output_1.png";
+let maskCenter = null;
+let maskCenterSize = null;
 
 function preload() {
   sourceImg = loadImage(sourceFile);
@@ -21,97 +23,112 @@ function setup () {
   sourceImg.loadPixels();
   maskImg.loadPixels();
   colorMode(HSB);
+
+  maskCenterSearch(20);
 }
 
-let X_STOP = 600;
-let Y_STOP = 600;
-// let X_STOP = 1920;
-// let Y_STOP = 1080;
-//let OFFSET = 20;
-let OFFSET = 6;
+// let X_STOP = 640;
+// let Y_STOP = 480;
+let X_STOP = 1920;
+let Y_STOP = 1080;
+let OFFSET = 20;
+
+function maskCenterSearch(min_width) {
+    let max_up_down = 0;
+    let max_left_right = 0;
+    let max_x_index = 0;
+    let max_y_index = 0;
+
+    // first scan all rows top to bottom
+    print("Scanning mask top to bottom...")
+    for(let j=0; j<Y_STOP; j++) {
+      // look across this row left to right and count
+      let mask_count = 0;
+      for(let i=0; i<X_STOP; i++) {
+        let mask = maskImg.get(i, j);
+        if (mask[0] > 128) {
+          mask_count = mask_count + 1;
+        }
+      }
+      // check if that row sets a new record
+      if (mask_count > max_left_right) {
+        max_left_right = mask_count;
+        max_y_index = j;
+      }
+    }
+
+    // now scan once left to right as well
+    print("Scanning mask left to right...")
+    for(let i=0; i<X_STOP; i++) {
+      // look across this column up to down and count
+      let mask_count = 0;
+      for(let j=0; j<Y_STOP; j++) {
+        let mask = maskImg.get(i, j);
+        if (mask[0] > 128) {
+          mask_count = mask_count + 1;
+        }
+      }
+      // check if that row sets a new record
+      if (mask_count > max_up_down) {
+        max_up_down = mask_count;
+        max_x_index = i;
+      }
+    }
+
+    print("Scanning mask done!")
+    if (max_left_right > min_width && max_up_down > min_width) {
+      maskCenter = [max_x_index, max_y_index];
+      maskCenterSize = [max_left_right, max_up_down];
+    }
+}
+
 let renderCounter=0;
 function draw () {
-  angleMode(DEGREES);
+  // angleMode(DEGREES);
   let num_lines_to_draw = 40;
+  let pointSize = 10;
+  let pointSpace = 5;
   // get one scanline
   for(let j=renderCounter; j<renderCounter+num_lines_to_draw && j<Y_STOP; j++) {
     for(let i=0; i<X_STOP; i++) {
       colorMode(RGB);
       let mask = maskImg.get(i, j);
-  
-      let pix = [0, 0, 0, 255];
-
-      if (mask[1] < 128) {
-
-        let sum_rgb = [0, 0, 0]
-        let num_cells = 0;
-        for(let wx=-OFFSET;wx<OFFSET;wx++){
-          for (let wy=-OFFSET;wy<OFFSET;wy++) {
-            let pix = sourceImg.get(i+wx, j+wy);
-            for(let c=0; c<3; c++) {
-              sum_rgb[c] += pix[c];
-            }
-            num_cells += 1;
-          }
+      if (mask[0] < 128) {
+        pix = sourceImg.get(i, j);
+      }
+      else {
+        if(j%5 == 0) {
+          if(i% pointSpace == 0) {
+          pix = [255, 255, 0, 255]
+        noStroke();
+        ellipse(i, j, pointSize, pointSize);
+        }
+        else {
+          pix = sourceImg.get(i, j);    
+          set(i, j, pix);      
         }
 
-        for(let c=0; c<3; c++) {
-          pix[c] = int(sum_rgb[c] / num_cells);
-        } 
-      
-       }
-
-      else {
-        let wave = sin(j*8);
-        let slip = map(wave, -1, 1, -OFFSET, OFFSET);
-        pix = sourceImg.get(i+slip, j);
-
-        // let brt = map(wave, -1, 1, 0, 255);
-        // for(let c=0; c<3; c++) {
-        //   pix[c] = brt;
-        // }
-      }
-      set(i, j, pix);
-   
+      // set(i, j, pix);
     }
   }
- //////////// this is the finish of the blur 
-
+}
+  }
   renderCounter = renderCounter + num_lines_to_draw;
   updatePixels();
 
-///// drawing Eyes 
-let eyeSize = 100; 
-let spacing = 300;
-
-  for(let i = 0; i < X_STOP; i = i +spacing){
-    for(let j = 0; j < Y_STOP; j = j+spacing){
-      let mask = maskImg.get(i, j);
-      if (mask[1] < 128) {
-      DrawEye(i,j, eyeSize- 20);
+  if (maskCenter !== null) {
+    strokeWeight(2);
+    fill(0, 255, 0);
+    stroke(255, 0, 0);
+    ellipse(maskCenter[0], maskCenter[1], 100);
+    line(maskCenter[0]-200, maskCenter[1], maskCenter[0]+200, maskCenter[1]);
+    line(maskCenter[0], maskCenter[1]-200, maskCenter[0], maskCenter[1]+200);
+    noFill();
+    let mcw = maskCenterSize[0];
+    let mch = maskCenterSize[1];
+    rect(maskCenter[0]-mcw/2, maskCenter[1]-mch/2, mcw, mch);
   }
-  }
-}
 
-  // /////// drawing Wiggle 
-  // for(let j=renderCounter; j<renderCounter+num_lines_to_draw && j<Y_STOP; j++) {
-  //   for(let i=0; i<X_STOP; i++) {
-
-  //     colorMode(RGB);
-  //     let mask = maskImg.get(i, j);
-  //     if (mask[1] > 128) { 
-
-  //       let wave = sin(j*8);
-  //       let slip = map(wave, -1, 1, -OFFSET, OFFSET);
-  //       pix = sourceImg.get(i+slip, j);
-  //     } 
-  //     set(i, j, pix);
-  //   }
-  // }
-
-
-
- 
   // print(renderCounter);
   if(renderCounter > Y_STOP) {
     console.log("Done!")
@@ -119,15 +136,6 @@ let spacing = 300;
     // uncomment this to save the result
     // saveArtworkImage(outputFile);
   }
-}
-
-function DrawEye(x, y, Size){
-fill(255)
-  ellipse(x, y, Size);
-  let offsetX = random(-10,10);
-  let offsetY = random(-10,10);
-  fill(133, 146, 158 )
-  ellipse(x+offsetX, y+offsetY, Size-40);
 }
 
 function keyTyped() {
