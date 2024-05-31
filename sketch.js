@@ -1,60 +1,102 @@
-let sourceImg = null;
-let maskImg = null;
-// let renderCounter = 0;
+let sourceImg=null;
+let maskImg=null;
+let renderCounter=0;
 
-// Modify these three lines to the appropriate file name
-let sourceFile = "input_2.jpg";
-let maskFile = "mask_2.png";
-let outputFile = "output_2.png";
+// change these three lines as appropiate
+let sourceFile = "input_1.jpg";
+let maskFile   = "mask_1.png";
+let outputFile = "output_1.png";
 
 function preload() {
   sourceImg = loadImage(sourceFile);
   maskImg = loadImage(maskFile);
 }
-  
 
-function setup() {
-  createCanvas(1920, 1080);
+function setup () {
+  let main_canvas = createCanvas(1920, 1080);
+  main_canvas.parent('canvasContainer');
+
   imageMode(CENTER);
   noStroke();
   background(0, 0, 128);
   sourceImg.loadPixels();
   maskImg.loadPixels();
-  drawCAeffect();
+  colorMode(RGB);
 }
 
-//ChromaticAberration
-function drawCAeffect() {
-let offsetX = 20; 
-let w = sourceImg.width;
-let h = sourceImg.height;
-sourceImg.loadPixels();
-maskImg.loadPixels();
+function draw () {
+  let num_lines_to_draw = 40;
+  // get one scanline
+  for(let j=renderCounter; j<renderCounter+num_lines_to_draw && j<1080; j++) {
+    for(let i=0; i<1920; i++) {
+      colorMode(RGB);
+      let pix = sourceImg.get(i, j);
+      // create a color from the values (always RGB)
+      let col = color(pix);
+      let mask = maskImg.get(i, j);
 
-for (let y = 0; y < h; y++) {
-for (let x = 0; x < w; x++) {
-let index = (x + y * w) * 4;
+      // colorMode(HSB, 360, 100, 100);
+      // draw a "dimmed" version in gray
+      colorMode(RGB);
+      let r = red(col);
+      let g = green(col);
+      let b = blue(col);
+      
+      offset_R =10;
+      offset_G =-10;
+      offset_B =0;
+      
 
-let mask = maskImg.pixels[index];
-let r = sourceImg.pixels[index];
-let g = sourceImg.pixels[index + 1];
-let b = sourceImg.pixels[index + 2];
-let a = sourceImg.pixels[index + 3];
+       //rgb of chromatic aberration 
+      let current_r;
+      if (i + offset_R < width) {
+        current_r = sourceImg.get(i + offset_R,j);
+      } else {
+        current_r =col;
+      }
 
-if (mask < 128) {
-set(x + offsetX, y, color(r, 0, 0,a-100));// red
-set(x, y, color(0, g, 0,a-100));//green
-set(x - offsetX, y, color(0, 0, b,a-100));// blue
-} else {
+     
+      let current_g;
+      if (i + offset_G >= 0) {
+        current_g = sourceImg.get(i + offset_G,j);
+      } else {
+        current_g =col;
+      }
 
-set(x, y, color(r, g, b,a));// keep original color
+      let current_b;
+      if (i + offset_B < width) {
+        current_b = sourceImg.get(i + offset_B,j);
+      } else {
+        current_b =col;
+      }
+
+
+
+      if(mask[0] < 128) {
+        // draw the full pixels
+        // let new_sat = map(s, 0, 100, 50, 100);
+        let new_col = color(red(current_r), green(current_g), blue(current_b));
+        // let new_hue = map(h, 0, 360, 180, 540);
+        set(i, j, new_col);
+      }
+      else {
+        // let new_brt = map(b, 0, 100, 20, 40);
+        let old_col = color(r, g, b);
+        // let new_col = color(h, s, b);
+        set(i, j, old_col);
+      }
+    }
+  }
+  renderCounter = renderCounter + num_lines_to_draw;
+  updatePixels();
+  // print(renderCounter);
+  if(renderCounter > 1080) {
+    console.log("Done!")
+    noLoop();
+    // uncomment this to save the result
+    // saveArtworkImage(outputFile);
+  }
 }
-}
-}
-
-updatePixels();
-}
-
 
 function keyTyped() {
   if (key == '!') {
