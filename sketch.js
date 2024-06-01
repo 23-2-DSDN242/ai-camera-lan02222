@@ -42,30 +42,32 @@ function draw () {
       let g = green(col);
       let b = blue(col);
       
-      offset_R =10;
-      offset_G =-10;
-      offset_B =0;
+      let offset_R =15;
+      let offset_G =0;
+      let offset_B =-15;
+
+      let offset_z = 5;
       
 
        //rgb of chromatic aberration 
       let current_r;
-      if (i + offset_R < width) {
-        current_r = sourceImg.get(i + offset_R,j);
+      if (i + offset_R < width && j + offset_z< height) {
+        current_r = sourceImg.get(i + offset_R,j+offset_z);
       } else {
         current_r =col;
       }
 
      
       let current_g;
-      if (i + offset_G >= 0) {
+      if (i + offset_G >= 0 && j>= 0) {
         current_g = sourceImg.get(i + offset_G,j);
       } else {
         current_g =col;
       }
 
       let current_b;
-      if (i + offset_B < width) {
-        current_b = sourceImg.get(i + offset_B,j);
+      if (i + offset_B < width &&  j- offset_z< height) {
+        current_b = sourceImg.get(i + offset_B,j-offset_z);
       } else {
         current_b =col;
       }
