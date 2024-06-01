@@ -2,9 +2,9 @@ let sourceImg=null;
 let maskImg=null;
 
 // change these three lines as appropiate
-let sourceFile = "input_1.jpg";
-let maskFile   = "mask_1.png";
-let outputFile = "output_1.png";
+let sourceFile = "input_2.jpg";
+let maskFile   = "mask_2.png";
+let outputFile = "output_2.png";
 let maskCenter = null;
 let maskCenterSize = null;
 
@@ -115,20 +115,53 @@ function draw () {
     strokeWeight(1);
     noFill();
     stroke(235,191,103);
+
+    if (maskCenter[0]> width/2){
+    //big  cireles
     // ellipse(maskCenter[0], maskCenter[1], 260);
-    ellipse(maskCenter[0], maskCenter[1], 360);
+    ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+60);//260
     strokeWeight(0.75);
-    ellipse(maskCenter[0], maskCenter[1], 420);
+    ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+120);//320
     strokeWeight(0.5);
-    ellipse(maskCenter[0], maskCenter[1], 560);
-  
+    ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+260);//460
+
+    //small
     fill(235,191,103);
-    ellipse(maskCenter[0]-100, maskCenter[1]+180, 20);
-    ellipse(maskCenter[0], maskCenter[1]-175, 10);
-    ellipse(maskCenter[0]+100, maskCenter[1]-180, 8);
-    ellipse(maskCenter[0]+150, maskCenter[1]+160, 10);
-    ellipse(maskCenter[0]-260, maskCenter[1]-20, 10);
-    
+    ellipse(maskCenter[0]-100, maskCenter[1]+210, maskCenterSize[1]/20);// down left，20
+    ellipse(maskCenter[0]+80, maskCenter[1]-140, maskCenterSize[1]/20);// top left，10
+    ellipse(maskCenter[0]+180, maskCenter[1]-145, maskCenterSize[1]/25);// top right，8
+    ellipse(maskCenter[0]+150, maskCenter[1]+175, maskCenterSize[1]/30);//down right，10
+    ellipse(maskCenter[0]-230, maskCenter[1]-20, maskCenterSize[1]/30);//middle left，10
+    ellipse(maskCenter[0]-20, maskCenter[1]+160, maskCenterSize[1]/30);//down middle，10
+    }
+    else{
+    //smile face
+    noStroke();
+    fill(91,57,37);
+    //eye
+    ellipse(maskCenter[0]-29, maskCenter[1]-10, maskCenterSize[0]/15);
+    ellipse(maskCenter[0]+29, maskCenter[1]-10, maskCenterSize[0]/15); 
+    //mouth
+    noFill();
+    stroke(243,116,90);
+    strokeWeight(5);
+    strokeCap(ROUND);
+    let mouthWidth = maskCenterSize[0]/4;
+    let mouthHeight = maskCenterSize[1]/15;
+    let mouthX =maskCenter[0] - mouthWidth/2;
+    let mouthY =maskCenter[1] + maskCenterSize[0]/8;
+
+    beginShape();
+    vertex(mouthX,mouthY);
+    bezierVertex(mouthX + mouthWidth/3, mouthY + mouthHeight, mouthX+mouthWidth/3*2,mouthY + mouthHeight, mouthX + mouthWidth, mouthY );
+    endShape();
+
+    //Blush
+    noStroke();
+    fill(253,129,74,50);    
+    ellipse(maskCenter[0]-60, maskCenter[1]+5, maskCenterSize[0]/5);
+    ellipse(maskCenter[0]+60, maskCenter[1]+5, maskCenterSize[0]/5);        
+
     // translate(maskCenter[0], maskCenter[1]);
     // for (let i = 0; i < 20; i++) {
     //   rotate(35);
@@ -146,6 +179,7 @@ function draw () {
     // let mch = maskCenterSize[1];
     // rect(maskCenter[0]-mcw/2, maskCenter[1]-mch/2, mcw, mch);
   }
+}
 
   // print(renderCounter);
   if(renderCounter > Y_STOP) {
