@@ -3,9 +3,9 @@ let maskImg=null;
 let renderCounter=0;
 
 // change these three lines as appropiate
-let sourceFile = "input_3.jpg";
-let maskFile   = "mask_3.png";
-let outputFile = "output_3.png";
+let sourceFile = "input_1.jpg";
+let maskFile   = "mask_1.png";
+let outputFile = "output_1.png";
 let maskCenter = null;
 let maskCenterSize = null;
 
@@ -113,6 +113,10 @@ function drawMaskCenter(){
   noFill();
   stroke(235,191,103);
 
+  if (maskCenter[0]> width/2){
+  //big  circles
+  // ellipse(maskCenter[0], maskCenter[1], 260);
+
   ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+60);//260
   strokeWeight(0.75);
   ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+120);//320
@@ -128,7 +132,36 @@ function drawMaskCenter(){
   ellipse(maskCenter[0]-230, maskCenter[1]-20, maskCenterSize[1]/30);//middle left，10
   ellipse(maskCenter[0]-20, maskCenter[1]+160, maskCenterSize[1]/30);//down middle，10
   }
+  else{
+  //smile face
+   //Blush
+  noStroke();
+  fill(253,129,74,60);    
+  ellipse(maskCenter[0]-maskCenter[0]/18, maskCenter[1]+9, maskCenterSize[0]/8);
+  ellipse(maskCenter[0]+maskCenter[0]/18, maskCenter[1]+9, maskCenterSize[0]/8); 
+  
+  noStroke();
+  fill(91,57,37);
+  //eye
+  ellipse(maskCenter[0]-29, maskCenter[1]-10, maskCenterSize[0]/15);
+  ellipse(maskCenter[0]+29, maskCenter[1]-10, maskCenterSize[0]/15); 
+  //mouth
+  noFill();
+  stroke(243,116,90);
+  strokeWeight(5);
+  strokeCap(ROUND);
+  let mouthWidth = maskCenterSize[0]/6;
+  let mouthHeight = maskCenterSize[1]/20;
+  let mouthX =maskCenter[0] - mouthWidth/2;
+  let mouthY =maskCenter[1] + maskCenterSize[0]/12;
 
+  beginShape();
+  vertex(mouthX,mouthY);
+  bezierVertex(mouthX + mouthWidth/3, mouthY + mouthHeight, mouthX+mouthWidth/3*2,mouthY + mouthHeight, mouthX + mouthWidth, mouthY );
+  endShape();
+
+}
+}
   function maskCenterSearch(min_width) {
     let max_up_down = 0;
     let max_left_right = 0;
