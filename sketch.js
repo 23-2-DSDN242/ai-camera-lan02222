@@ -6,6 +6,8 @@ let renderCounter=0;
 let sourceFile = "input_3.jpg";
 let maskFile   = "mask_3.png";
 let outputFile = "output_3.png";
+let maskCenter = null;
+let maskCenterSize = null;
 
 function preload() {
   sourceImg = loadImage(sourceFile);
@@ -22,6 +24,8 @@ function setup () {
   sourceImg.loadPixels();
   maskImg.loadPixels();
   colorMode(RGB);
+
+  maskCenterSearch(20);
 }
 
 function draw () {
@@ -91,7 +95,11 @@ function draw () {
   }
   renderCounter = renderCounter + num_lines_to_draw;
   updatePixels();
-  // print(renderCounter);
+
+  if (maskCenter !== null) {
+    drawMaskCenter();
+  }
+
   if(renderCounter > 1080) {
     console.log("Done!")
     noLoop();
@@ -100,8 +108,80 @@ function draw () {
   }
 }
 
-function keyTyped() {
-  if (key == '!') {
-    saveBlocksImages();
+function drawMaskCenter(){
+  strokeWeight(1);
+  noFill();
+  stroke(235,191,103);
+
+  ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+60);//260
+  strokeWeight(0.75);
+  ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+120);//320
+  strokeWeight(0.5);
+  ellipse(maskCenter[0], maskCenter[1], maskCenterSize[0]+260);//460
+
+  //small
+  fill(235,191,103);
+  ellipse(maskCenter[0]-100, maskCenter[1]+210, maskCenterSize[1]/20);// down left，20
+  ellipse(maskCenter[0]+80, maskCenter[1]-140, maskCenterSize[1]/20);// top left，10
+  ellipse(maskCenter[0]+180, maskCenter[1]-145, maskCenterSize[1]/25);// top right，8
+  ellipse(maskCenter[0]+150, maskCenter[1]+175, maskCenterSize[1]/30);//down right，10
+  ellipse(maskCenter[0]-230, maskCenter[1]-20, maskCenterSize[1]/30);//middle left，10
+  ellipse(maskCenter[0]-20, maskCenter[1]+160, maskCenterSize[1]/30);//down middle，10
   }
-}
+
+  function maskCenterSearch(min_width) {
+    let max_up_down = 0;
+    let max_left_right = 0;
+    let max_x_index = 0;
+    let max_y_index = 0;
+    let X_STOP = 1920;
+    let Y_STOP = 1080;
+
+    // first scan all rows top to bottom
+    print("Scanning mask top to bottom...")
+    for(let j=0; j<Y_STOP; j++) {
+      // look across this row left to right and count
+      let mask_count = 0;
+      for(let i=0; i<X_STOP; i++) {
+        let mask = maskImg.get(i, j);
+        if (mask[0] > 128) {
+          mask_count = mask_count + 1;
+        }
+      }
+      // check if that row sets a new record
+      if (mask_count > max_left_right) {
+        max_left_right = mask_count;
+        max_y_index = j;
+      }
+    }
+
+    // now scan once left to right as well
+    print("Scanning mask left to right...")
+    for(let i=0; i<X_STOP; i++) {
+      // look across this column up to down and count
+      let mask_count = 0;
+      for(let j=0; j<Y_STOP; j++) {
+        let mask = maskImg.get(i, j);
+        if (mask[0] > 128) {
+          mask_count = mask_count + 1;
+        }
+      }
+      // check if that row sets a new record
+      if (mask_count > max_up_down) {
+        max_up_down = mask_count;
+        max_x_index = i;
+      }
+    }
+
+    print("Scanning mask done!")
+    if (max_left_right > min_width && max_up_down > min_width) {
+      maskCenter = [max_x_index, max_y_index];
+      maskCenterSize = [max_left_right, max_up_down];
+    }
+  }
+
+    function keyTyped() {
+      if (key == '!') {
+        saveBlocksImages();
+      }
+    }
