@@ -3,9 +3,9 @@ let maskImg=null;
 let renderCounter=0;
 
 // change these three lines as appropiate
-let sourceFile = "input_1.jpg";
-let maskFile   = "mask_1.png";
-let outputFile = "output_1.png";
+let sourceFile = "input_3.jpg";
+let maskFile   = "mask_3.png";
+let outputFile = "output_3.png";
 
 function preload() {
   sourceImg = loadImage(sourceFile);
@@ -42,16 +42,16 @@ function draw () {
       let g = green(col);
       let b = blue(col);
       
-      let offset_R =15;
-      let offset_G =0;
-      let offset_B =-15;
+      let offset_R =5;
+      let offset_G =-5;
+      let offset_B =0;
 
-      let offset_z = 5;
+      let offset_z = 10;
       
 
        //rgb of chromatic aberration 
       let current_r;
-      if (i + offset_R < width && j + offset_z< height) {
+      if (i + offset_R < width && j + offset_z>= 0) {
         current_r = sourceImg.get(i + offset_R,j+offset_z);
       } else {
         current_r =col;
@@ -59,15 +59,15 @@ function draw () {
 
      
       let current_g;
-      if (i + offset_G >= 0 && j>= 0) {
-        current_g = sourceImg.get(i + offset_G,j);
+      if (i + offset_G < width && j- offset_z>= 0) {
+        current_g = sourceImg.get(i + offset_G,j- offset_z);
       } else {
         current_g =col;
       }
 
       let current_b;
-      if (i + offset_B < width &&  j- offset_z< height) {
-        current_b = sourceImg.get(i + offset_B,j-offset_z);
+      if (i + offset_B >= 0 &&  j>= 0) {
+        current_b = sourceImg.get(i ,j);
       } else {
         current_b =col;
       }
