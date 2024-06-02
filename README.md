@@ -25,7 +25,7 @@ Practice this to get familiar with how the code works.
 
 ## 4. New theme Moon : 
 
-Because AI can't recognize the mask of the picture, I had to change the theme. The new theme is the moon. Inspiration: Mid-Autumn Festival is one of the important traditional festivals in China, which symbolizes reunion and harmony. On this day, families will get together and spend a good time together. One of the symbols of Mid-Autumn Festival is the full moon, which means perfection and happiness.
+Because AI can't recognize the mask of the picture, I had to change the theme. The new theme is the moon. Inspiration: Mid-Autumn Festival is one of the important traditional festivals in China, which symbolizes reunion and harmony. On this day, families will get together and spend a good time together. One of the symbols of Mid-Autumn Festival is the full moon, which means perfection and happiness.People have the habit of appreciating the moon during the Mid-Autumn Festival. So the filter I want to make is one that can help people appreciate the moon, making the moon look very different.
 
 
 ## 5. Some failed attempts : Chromatic Aberration
@@ -58,5 +58,7 @@ Use the
 
 ## 9. combine and adjustment : 
 Develop the circle and square. Make them similar to the magic circle and the smiley face respectively (try to make them scale with the mask). After combining the Chromatic Aberration filter and the Center Scan filter, make some adjustments to the Chromatic Aberration filter and the smiley face.
+The last filter expresses that in the special Mid-Autumn Festival, under the shining moonlight, the picture in front of us becomes looming. The chromatic aberration filter reveals a mysterious color. The special pattern and smiling face of the moon seem to convey the Mid-Autumn Festival blessings to people.
+
 ![Alt text](images/14.png)
 ![Alt text](images/15.png)![Alt text](images/16.png)![Alt text](images/17.png)
